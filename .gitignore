@@ -1,7 +1,7 @@
 HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
+backend/.gradle
+backend/build/
+!backend/gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
@@ -38,3 +38,11 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+# frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# planning docs
+projeto-milestones.md
