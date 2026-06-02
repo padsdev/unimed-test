@@ -3,6 +3,7 @@ import { Merriweather_Sans, Source_Sans_3 } from "next/font/google";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { AppQueryProvider } from "@/contexts/query-provider";
+import { ToastProvider } from "@/components/ui/toast";
 
 import "./globals.css";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${sourceSans.variable} ${merriweatherSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AppQueryProvider>
-          <AppShell>{children}</AppShell>
+          <ToastProvider>
+            <AppShell>{children}</AppShell>
+          </ToastProvider>
         </AppQueryProvider>
       </body>
     </html>

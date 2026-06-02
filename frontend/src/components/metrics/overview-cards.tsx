@@ -14,7 +14,7 @@ export function OverviewCards({ pacientes, atendimentos, procedimentos }: Overvi
   const values = { pacientes, atendimentos, procedimentos };
 
   return (
-    <section className="grid gap-4 md:grid-cols-3">
+    <section className="grid gap-4 md:grid-cols-3 h-24">
       {metrics.map((metric) => (
         <article key={metric.key} className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
           <p className="text-sm text-[color:var(--text-500)]">{metric.label}</p>

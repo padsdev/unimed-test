@@ -1,0 +1,726 @@
+openapi: "3.1.0"
+info:
+  title: "API Clínica Prime"
+  description: "Gestão assistencial — pacientes, atendimentos, procedimentos e histórico clínico"
+  version: "1.0.0"
+  contact:
+    name: "Equipe Prime"
+    email: "dev@clinicaprime.com"
+
+servers:
+  - url: "http://localhost:8080/api"
+    description: "Desenvolvimento local (backend Spring Boot)"
+
+paths:
+  /pacientes:
+    get:
+      operationId: "listPacientes"
+      summary: "Lista pacientes com paginação e busca"
+      tags: ["Pacientes"]
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/searchQuery"
+      responses:
+        "200":
+          description: "Lista paginada de pacientes"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResponsePaciente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      operationId: "criarPaciente"
+      summary: "Cadastra novo paciente"
+      tags: ["Pacientes"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CriarPacienteRequest"
+      responses:
+        "201":
+          description: "Paciente criado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Paciente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /pacientes/{id}:
+    get:
+      operationId: "obterPaciente"
+      summary: "Obtém paciente por ID"
+      tags: ["Pacientes"]
+      parameters:
+        - $ref: "#/components/parameters/pacienteId"
+      responses:
+        "200":
+          description: "Dados do paciente"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Paciente"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: "atualizarPaciente"
+      summary: "Atualiza dados do paciente"
+      tags: ["Pacientes"]
+      parameters:
+        - $ref: "#/components/parameters/pacienteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AtualizarPacienteRequest"
+      responses:
+        "200":
+          description: "Paciente atualizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Paciente"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: "excluirPaciente"
+      summary: "Exclui paciente (apenas se sem vínculos ativos)"
+      tags: ["Pacientes"]
+      parameters:
+        - $ref: "#/components/parameters/pacienteId"
+      responses:
+        "204":
+          description: "Excluído"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /atendimentos:
+    get:
+      operationId: "listAtendimentos"
+      summary: "Lista atendimentos com paginação e filtros"
+      tags: ["Atendimentos"]
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/searchQuery"
+        - name: "pacienteId"
+          in: "query"
+          description: "Filtra por paciente"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Lista paginada de atendimentos"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResponseAtendimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      operationId: "criarAtendimento"
+      summary: "Registra novo atendimento"
+      tags: ["Atendimentos"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CriarAtendimentoRequest"
+      responses:
+        "201":
+          description: "Atendimento criado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Atendimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /atendimentos/{id}:
+    get:
+      operationId: "obterAtendimento"
+      summary: "Obtém atendimento por ID"
+      tags: ["Atendimentos"]
+      parameters:
+        - $ref: "#/components/parameters/atendimentoId"
+      responses:
+        "200":
+          description: "Dados do atendimento"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Atendimento"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: "atualizarAtendimento"
+      summary: "Atualiza dados do atendimento"
+      tags: ["Atendimentos"]
+      parameters:
+        - $ref: "#/components/parameters/atendimentoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AtualizarAtendimentoRequest"
+      responses:
+        "200":
+          description: "Atendimento atualizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Atendimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: "excluirAtendimento"
+      summary: "Exclui atendimento e seus procedimentos"
+      tags: ["Atendimentos"]
+      parameters:
+        - $ref: "#/components/parameters/atendimentoId"
+      responses:
+        "204":
+          description: "Excluído"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /procedimentos:
+    get:
+      operationId: "listProcedimentos"
+      summary: "Lista procedimentos com paginação e filtros"
+      tags: ["Procedimentos"]
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/size"
+        - $ref: "#/components/parameters/sort"
+        - $ref: "#/components/parameters/searchQuery"
+        - name: "atendimentoId"
+          in: "query"
+          description: "Filtra por atendimento"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Lista paginada de procedimentos"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedResponseProcedimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      operationId: "criarProcedimento"
+      summary: "Adiciona procedimento a um atendimento"
+      tags: ["Procedimentos"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CriarProcedimentoRequest"
+      responses:
+        "201":
+          description: "Procedimento criado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Procedimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /procedimentos/{id}:
+    get:
+      operationId: "obterProcedimento"
+      summary: "Obtém procedimento por ID"
+      tags: ["Procedimentos"]
+      parameters:
+        - $ref: "#/components/parameters/procedimentoId"
+      responses:
+        "200":
+          description: "Dados do procedimento"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Procedimento"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: "atualizarProcedimento"
+      summary: "Atualiza dados do procedimento"
+      tags: ["Procedimentos"]
+      parameters:
+        - $ref: "#/components/parameters/procedimentoId"
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AtualizarProcedimentoRequest"
+      responses:
+        "200":
+          description: "Procedimento atualizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Procedimento"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: "excluirProcedimento"
+      summary: "Exclui procedimento"
+      tags: ["Procedimentos"]
+      parameters:
+        - $ref: "#/components/parameters/procedimentoId"
+      responses:
+        "204":
+          description: "Excluído"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /historico/{pacienteId}:
+    get:
+      operationId: "obterHistorico"
+      summary: "Obtém histórico completo do paciente com atendimentos e procedimentos"
+      tags: ["Histórico"]
+      parameters:
+        - $ref: "#/components/parameters/pacienteId"
+        - name: "sortOrder"
+          in: "query"
+          description: "Ordenação cronológica dos atendimentos"
+          required: false
+          schema:
+            type: string
+            enum: [desc, asc]
+            default: desc
+      responses:
+        "200":
+          description: "Histórico do paciente"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoricoPaciente"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    page:
+      name: page
+      in: query
+      description: "Número da página (0-based)"
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    size:
+      name: size
+      in: query
+      description: "Itens por página"
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    sort:
+      name: sort
+      in: query
+      description: "Campo de ordenação (ex: nome,asc)"
+      required: false
+      schema:
+        type: string
+    searchQuery:
+      name: q
+      in: query
+      description: "Busca textual (nome/CPF)"
+      required: false
+      schema:
+        type: string
+    pacienteId:
+      name: id
+      in: path
+      description: "ID do paciente"
+      required: true
+      schema:
+        type: integer
+    atendimentoId:
+      name: id
+      in: path
+      description: "ID do atendimento"
+      required: true
+      schema:
+        type: integer
+    procedimentoId:
+      name: id
+      in: path
+      description: "ID do procedimento"
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    # ─── Paciente ──────────────────────────────────────────────
+    Paciente:
+      type: object
+      required: [id, nome, cpf, dataNascimento, telefone, email, status]
+      properties:
+        id:
+          type: integer
+          example: 1
+        nome:
+          type: string
+          example: "João da Silva"
+        cpf:
+          type: string
+          example: "123.456.789-00"
+        dataNascimento:
+          type: string
+          format: date
+          example: "1985-03-15"
+        telefone:
+          type: string
+          example: "(11) 98888-1111"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@email.com"
+        status:
+          type: string
+          enum: [ativo, inativo]
+          example: ativo
+
+    CriarPacienteRequest:
+      type: object
+      required: [nome, cpf, dataNascimento, telefone, email]
+      properties:
+        nome:
+          type: string
+          maxLength: 150
+          example: "João da Silva"
+        cpf:
+          type: string
+          pattern: "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$"
+          example: "123.456.789-00"
+        dataNascimento:
+          type: string
+          format: date
+          example: "1985-03-15"
+        telefone:
+          type: string
+          example: "(11) 98888-1111"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@email.com"
+
+    AtualizarPacienteRequest:
+      type: object
+      required: [nome, dataNascimento, telefone, email, status]
+      properties:
+        nome:
+          type: string
+          maxLength: 150
+          example: "João da Silva"
+        dataNascimento:
+          type: string
+          format: date
+          example: "1985-03-15"
+        telefone:
+          type: string
+          example: "(11) 98888-1111"
+        email:
+          type: string
+          format: email
+          example: "joao.silva@email.com"
+        status:
+          type: string
+          enum: [ativo, inativo]
+          example: ativo
+
+    # ─── Atendimento ───────────────────────────────────────────
+    Atendimento:
+      type: object
+      required: [id, pacienteId, dataAtendimento, medico, observacoes]
+      properties:
+        id:
+          type: integer
+          example: 10
+        pacienteId:
+          type: integer
+          example: 1
+        dataAtendimento:
+          type: string
+          format: date-time
+          example: "2026-05-01T12:00:00Z"
+        medico:
+          type: string
+          example: "Dr. Carlos Andrade"
+        observacoes:
+          type: string
+          example: "Dor torácica em monitoramento"
+
+    CriarAtendimentoRequest:
+      type: object
+      required: [pacienteId, dataAtendimento, medico, observacoes]
+      properties:
+        pacienteId:
+          type: integer
+          example: 1
+        dataAtendimento:
+          type: string
+          format: date-time
+          example: "2026-05-01T12:00:00Z"
+        medico:
+          type: string
+          maxLength: 200
+          example: "Dr. Carlos Andrade"
+        observacoes:
+          type: string
+          maxLength: 2000
+          example: "Dor torácica em monitoramento"
+
+    AtualizarAtendimentoRequest:
+      type: object
+      required: [dataAtendimento, medico, observacoes]
+      properties:
+        dataAtendimento:
+          type: string
+          format: date-time
+          example: "2026-05-01T12:00:00Z"
+        medico:
+          type: string
+          maxLength: 200
+          example: "Dr. Carlos Andrade"
+        observacoes:
+          type: string
+          maxLength: 2000
+          example: "Dor torácica em monitoramento"
+
+    # ─── Procedimento ──────────────────────────────────────────
+    Procedimento:
+      type: object
+      required: [id, atendimentoId, nome, valor]
+      properties:
+        id:
+          type: integer
+          example: 100
+        atendimentoId:
+          type: integer
+          example: 10
+        nome:
+          type: string
+          example: "Eletrocardiograma"
+        valor:
+          type: number
+          format: double
+          minimum: 0
+          example: 120.0
+
+    CriarProcedimentoRequest:
+      type: object
+      required: [atendimentoId, nome, valor]
+      properties:
+        atendimentoId:
+          type: integer
+          example: 10
+        nome:
+          type: string
+          maxLength: 200
+          example: "Eletrocardiograma"
+        valor:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 120.0
+
+    AtualizarProcedimentoRequest:
+      type: object
+      required: [nome, valor]
+      properties:
+        nome:
+          type: string
+          maxLength: 200
+          example: "Eletrocardiograma"
+        valor:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 150.0
+
+    # ─── Histórico ─────────────────────────────────────────────
+    HistoricoPaciente:
+      type: object
+      required: [paciente, atendimentos]
+      properties:
+        paciente:
+          $ref: "#/components/schemas/Paciente"
+        atendimentos:
+          type: array
+          items:
+            $ref: "#/components/schemas/AtendimentoComProcedimentos"
+
+    AtendimentoComProcedimentos:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Atendimento"
+        - type: object
+          required: [procedimentos]
+          properties:
+            procedimentos:
+              type: array
+              items:
+                $ref: "#/components/schemas/Procedimento"
+
+    # ─── Paginação ─────────────────────────────────────────────
+    PagedResponse:
+      type: object
+      required: [items, page, size, totalItems, totalPages]
+      properties:
+        items:
+          type: array
+          items: {}
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+        totalItems:
+          type: integer
+          example: 42
+        totalPages:
+          type: integer
+          example: 3
+
+    PagedResponsePaciente:
+      allOf:
+        - $ref: "#/components/schemas/PagedResponse"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Paciente"
+
+    PagedResponseAtendimento:
+      allOf:
+        - $ref: "#/components/schemas/PagedResponse"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Atendimento"
+
+    PagedResponseProcedimento:
+      allOf:
+        - $ref: "#/components/schemas/PagedResponse"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/Procedimento"
+
+    # ─── Erros ─────────────────────────────────────────────────
+    ProblemDetail:
+      type: object
+      required: [type, title, status, detail]
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "about:blank"
+        title:
+          type: string
+          example: "Requisição inválida"
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: "Um ou mais campos estão inválidos"
+        instance:
+          type: string
+          format: uri
+          example: "/api/pacientes"
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldError"
+
+    FieldError:
+      type: object
+      required: [field, message, code]
+      properties:
+        field:
+          type: string
+          example: "cpf"
+        message:
+          type: string
+          example: "CPF inválido — formato esperado: 000.000.000-00"
+        code:
+          type: string
+          example: "INVALID_FORMAT"
+
+  responses:
+    BadRequest:
+      description: "Requisição mal formatada"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    ValidationError:
+      description: "Erro de validação"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    NotFound:
+      description: "Recurso não encontrado"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+    Conflict:
+      description: "Conflito — recurso possui vínculos que impedem exclusão"
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
