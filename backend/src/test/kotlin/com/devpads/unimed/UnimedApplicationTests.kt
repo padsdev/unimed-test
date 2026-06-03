@@ -1,14 +1,19 @@
-package com.devpads.unimed_test
+package com.devpads.unimed
 
+import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 @SpringBootTest(
 	properties = [
 		"spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration",
 	],
 )
-class UnimedTestApplicationTests {
+class UnimedApplicationTests {
+
+	@MockitoBean
+	lateinit var pacienteRepositoryPort: PacienteRepositoryPort
 
 	@Test
 	fun contextLoads() {

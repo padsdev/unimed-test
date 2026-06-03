@@ -1,11 +1,11 @@
-package com.devpads.unimed_test
+package com.devpads.unimed
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class UnimedTestApplication
+class UnimedApplication
 
 fun main(args: Array<String>) {
-	runApplication<UnimedTestApplication>(*args)
+	runApplication<UnimedApplication>(*args)
 }
