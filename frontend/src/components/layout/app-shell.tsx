@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Stethoscope, X } from "lucide-react";
-import { useState } from "react";
+import { Menu, Moon, Stethoscope, Sun, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,23 @@ function NavContent({ onClickItem }: { onClickItem?: () => void }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("theme");
+      return stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
+
+  function toggleTheme() {
+    const next = !dark;
+    setDark(next);
+    localStorage.setItem("theme", next ? "dark" : "light");
+  }
 
   return (
     <div className="min-h-dvh">
@@ -70,14 +87,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </p>
               <p className="text-[1rem] font-bold text-[color:var(--text-900)]">Painel operacional</p>
             </div>
-            <Button
-              className="absolute right-4 lg:hidden"
-              variant="outline"
-              size="icon-sm"
-              onClick={() => setDrawerOpen(true)}
-            >
-              <Menu className="size-4" />
-            </Button>
+            <div className="absolute right-4 flex items-center gap-2">
+              <Button
+                className="hidden lg:inline-flex"
+                variant="ghost"
+                size="icon-sm"
+                onClick={toggleTheme}
+              >
+                {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              </Button>
+              <Button
+                className="lg:hidden"
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setDrawerOpen(true)}
+              >
+                <Menu className="size-4" />
+              </Button>
+            </div>
           </header>
           <main className="min-h-0 flex-1 overflow-hidden">
             {children}
@@ -95,9 +122,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <div className="mb-6 flex items-center justify-between">
               <p className="text-sm font-bold text-[color:var(--text-900)]">Navegacao</p>
-              <Button variant="ghost" size="icon-sm" onClick={() => setDrawerOpen(false)}>
-                <X className="size-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon-sm" onClick={toggleTheme}>
+                  {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+                </Button>
+                <Button variant="ghost" size="icon-sm" onClick={() => setDrawerOpen(false)}>
+                  <X className="size-4" />
+                </Button>
+              </div>
             </div>
             <NavContent onClickItem={() => setDrawerOpen(false)} />
           </aside>

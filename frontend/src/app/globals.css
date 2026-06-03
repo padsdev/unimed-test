@@ -93,6 +93,9 @@
       radial-gradient(circle at 100% 20%, #edf8fb 0%, transparent 45%), var(--background);
     @apply text-foreground;
   }
+  .dark body {
+    background: var(--surface-0);
+  }
   html {
     @apply font-sans;
   }
