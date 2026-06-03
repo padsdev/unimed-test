@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-unimed_pacientes}
+      POSTGRES_USER: ${POSTGRES_USER:-unimed}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-unimed}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-unimed_operacional}
+      MYSQL_USER: ${MYSQL_USER:-unimed}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-unimed}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-unimed_pacientes}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-unimed}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-unimed}
+      MYSQL_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-unimed_operacional}
+      MYSQL_USER: ${MYSQL_USER:-unimed}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-unimed}
+    depends_on:
+      - postgres
+      - mysql
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  mysql_data:
