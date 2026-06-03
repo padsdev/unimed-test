@@ -6,7 +6,7 @@ Aplicacao full stack para gestao de pacientes, atendimentos e procedimentos, seg
 
 - `backend/`: API Kotlin + Spring Boot
 - `frontend/`: Next.js + TypeScript (App Router)
-- `docker-compose.yml`: sera adicionado na milestone de infraestrutura
+- `docker-compose.yml`: orquestracao de backend, frontend, PostgreSQL e MySQL
 
 ## Milestone 0 (estado atual)
 
@@ -34,6 +34,32 @@ pnpm dev
 ```
 
 App em `http://localhost:3000`
+
+## Executando com Docker Compose (Milestone 2)
+
+1. (Opcional) copie variaveis padrao:
+
+```bash
+cp .env.example .env
+```
+
+2. Suba toda stack:
+
+```bash
+docker-compose up --build
+```
+
+Servicos:
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8080`
+- Health backend: `http://localhost:8080/actuator/health`
+
+Notas:
+
+- PostgreSQL usa Flyway para criar schema de `pacientes`.
+- MySQL inicializa schema de `atendimentos` e `procedimentos` via `docker/mysql/init`.
+- Volumes nomeados preservam dados entre reinicios (`postgres_data`, `mysql_data`).
 
 ## Decisoes tecnicas da base
 
