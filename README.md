@@ -69,3 +69,38 @@ Notas:
 - Fuso padrao UTC na API
 - Tratamento de erro via Problem Details (RFC 7807)
 - Frontend-first com mocks tipados para acelerar UX
+
+## Flyway V2 (diagnostico rapido)
+
+Se a migration `V2__pacientes_constraints_and_normalization.sql` falhar, rode estes SQLs no PostgreSQL para identificar dados legados invalidos antes de tentar novamente.
+
+```sql
+-- CPF invalido apos normalizacao (esperado 11 digitos)
+SELECT id, nome, cpf, regexp_replace(cpf, '\\D', '', 'g') AS cpf_normalizado
+FROM pacientes
+WHERE length(regexp_replace(cpf, '\\D', '', 'g')) <> 11;
+
+-- CPF duplicado apos normalizacao
+SELECT regexp_replace(cpf, '\\D', '', 'g') AS cpf_normalizado, COUNT(*)
+FROM pacientes
+GROUP BY regexp_replace(cpf, '\\D', '', 'g')
+HAVING COUNT(*) > 1;
+
+-- Email com espaco em extremidade
+SELECT id, email
+FROM pacientes
+WHERE email <> btrim(email);
+
+-- Email vazio
+SELECT id, email
+FROM pacientes
+WHERE btrim(email) = '';
+
+-- Email duplicado ignorando case
+SELECT lower(email) AS email_normalizado, COUNT(*)
+FROM pacientes
+GROUP BY lower(email)
+HAVING COUNT(*) > 1;
+```
+
+Correcao deve ser manual e explicita nos dados legados. A migration nao faz auto-correcao de duplicidade nem inventa valores.
