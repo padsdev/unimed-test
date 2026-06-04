@@ -9,5 +9,4 @@ data class Paciente(
     val dataNascimento: LocalDate,
     val telefone: String,
     val email: String,
-    val status: String = "ativo",
 )

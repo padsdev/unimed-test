@@ -16,6 +16,24 @@ class PacienteRepositoryJpa(
 
     override fun findAll(pageable: Pageable): Page<Paciente> =
         jpaRepository.findAll(pageable).map { it.toDomain() }
+
+    override fun save(paciente: Paciente): Paciente =
+        jpaRepository.save(paciente.toEntity()).toDomain()
+
+    override fun deleteById(id: Long) =
+        jpaRepository.deleteById(id)
+
+    override fun existsByCpf(cpf: String): Boolean =
+        jpaRepository.existsByCpf(cpf)
+
+    override fun existsByCpfAndIdNot(cpf: String, id: Long): Boolean =
+        jpaRepository.existsByCpfAndIdNot(cpf, id)
+
+    override fun existsByEmailIgnoreCase(email: String): Boolean =
+        jpaRepository.existsByEmailIgnoreCase(email)
+
+    override fun existsByEmailIgnoreCaseAndIdNot(email: String, id: Long): Boolean =
+        jpaRepository.existsByEmailIgnoreCaseAndIdNot(email, id)
 }
 
 private fun PacienteEntity.toDomain() = Paciente(
@@ -25,5 +43,13 @@ private fun PacienteEntity.toDomain() = Paciente(
     dataNascimento = dataNascimento,
     telefone = telefone,
     email = email,
-    status = status,
+)
+
+private fun Paciente.toEntity() = PacienteEntity(
+    id = id,
+    nome = nome,
+    cpf = cpf,
+    dataNascimento = dataNascimento,
+    telefone = telefone,
+    email = email,
 )
