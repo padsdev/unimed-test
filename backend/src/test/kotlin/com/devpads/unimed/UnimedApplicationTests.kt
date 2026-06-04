@@ -7,6 +7,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 @SpringBootTest(
 	properties = [
+		"infra.mysql.enabled=false",
 		"spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration",
 	],
 )
