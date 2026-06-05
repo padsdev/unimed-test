@@ -169,7 +169,7 @@ Entregar primeiro modulo real e substituir mock correspondente no frontend.
 - **M4-CP2.2**: controller POST/PUT, DTOs com Bean Validation, testes unitarios service com mock. (concluido)
 - **M4-CP3**: DELETE /api/pacientes/{id} com validacao de vinculos (409 se atendimentos existentes). (concluido)
 - **M4-CP4**: frontend Pacientes migrado de mock para API real. (proximo)
-- **M4-CP5**: atualizacao de Swagger + testes/validacao fim a fim.
+- **M4-CP5**: seed Flyway V3 (5 pacientes reais ficticios) + testes de integracao fim a fim (Testcontainers, todos endpoints + validacoes).
 
 ---
 
