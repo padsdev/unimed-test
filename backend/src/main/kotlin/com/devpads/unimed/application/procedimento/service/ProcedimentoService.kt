@@ -15,8 +15,8 @@ class ProcedimentoService(
 ) {
     fun findById(id: Long): Procedimento? = procedimentoRepository.findById(id)
 
-    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String) =
-        procedimentoRepository.findAll(page, size, sortField, sortDirection)
+    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String, atendimentoId: Long? = null) =
+        procedimentoRepository.findAll(page, size, sortField, sortDirection, atendimentoId)
 
     fun findByAtendimentoId(atendimentoId: Long): List<Procedimento> =
         procedimentoRepository.findByAtendimentoId(atendimentoId)

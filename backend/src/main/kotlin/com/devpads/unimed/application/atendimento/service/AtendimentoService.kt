@@ -17,8 +17,8 @@ class AtendimentoService(
 ) {
     fun findById(id: Long): Atendimento? = atendimentoRepository.findById(id)
 
-    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String) =
-        atendimentoRepository.findAll(page, size, sortField, sortDirection)
+    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String, pacienteId: Long? = null) =
+        atendimentoRepository.findAll(page, size, sortField, sortDirection, pacienteId)
 
     fun create(command: CreateAtendimentoCommand): Atendimento {
         val violations = mutableListOf<UnimedViolation>()

@@ -18,8 +18,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.mockito.kotlin.whenever
 import org.mockito.kotlin.any
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.whenever
 import java.math.BigDecimal
 
 @SpringBootTest(
@@ -54,7 +55,7 @@ class ProcedimentoControllerIntegrationTest {
 
     @Test
     fun list_shouldReturnEmptyPage_whenNoProcedimentos() {
-        whenever(procedimentoRepository.findAll(0, 10, "nome", "asc"))
+        whenever(procedimentoRepository.findAll(any(), any(), any(), any(), isNull()))
             .thenReturn(PagedResult(emptyList(), 0, 10, 0L, 0))
 
         val response = restTemplate.getForEntity(url("/procedimentos"), Map::class.java)

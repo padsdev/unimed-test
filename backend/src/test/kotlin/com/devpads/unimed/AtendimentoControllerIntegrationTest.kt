@@ -21,6 +21,7 @@ import org.springframework.http.ProblemDetail
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.mockito.kotlin.any
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.whenever
 import java.time.Instant
 import java.time.LocalDate
@@ -57,7 +58,7 @@ class AtendimentoControllerIntegrationTest {
 
     @Test
     fun list_shouldReturnEmptyPage_whenNoAtendimentos() {
-        whenever(atendimentoRepository.findAll(any(), any(), any(), any()))
+        whenever(atendimentoRepository.findAll(any(), any(), any(), any(), isNull()))
             .thenReturn(PagedResult(emptyList(), 0, 10, 0L, 0))
 
         val response = restTemplate.getForEntity(url("/atendimentos"), Map::class.java)

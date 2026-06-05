@@ -29,25 +29,29 @@ class ProcedimentoMysqlAdapter(
         }
     }
 
-    override fun findAll(page: Int, size: Int, sortField: String, sortDirection: String): PagedResult<Procedimento> {
+    override fun findAll(page: Int, size: Int, sortField: String, sortDirection: String, atendimentoId: Long?): PagedResult<Procedimento> {
         val safeField = if (sortField in allowedSortFields) sortField else "nome"
         val safeDir = if (sortDirection.lowercase() == "desc") "DESC" else "ASC"
         val offset = page * size
+        val whereClause = if (atendimentoId != null) " WHERE atendimento_id = ?" else ""
 
-        val countSql = "SELECT COUNT(*) FROM procedimentos"
+        val countSql = "SELECT COUNT(*) FROM procedimentos$whereClause"
         val totalItems: Long = mysqlDataSource.connection.use { conn ->
             conn.prepareStatement(countSql).use { stmt ->
+                if (atendimentoId != null) stmt.setLong(1, atendimentoId)
                 stmt.executeQuery().use { rs ->
                     if (rs.next()) rs.getLong(1) else 0L
                 }
             }
         }
 
-        val dataSql = "SELECT id, atendimento_id, nome, valor FROM procedimentos ORDER BY $safeField $safeDir LIMIT ? OFFSET ?"
+        val dataSql = "SELECT id, atendimento_id, nome, valor FROM procedimentos$whereClause ORDER BY $safeField $safeDir LIMIT ? OFFSET ?"
         val items = mysqlDataSource.connection.use { conn ->
             conn.prepareStatement(dataSql).use { stmt ->
-                stmt.setInt(1, size)
-                stmt.setInt(2, offset)
+                var idx = 1
+                if (atendimentoId != null) { stmt.setLong(idx, atendimentoId); idx++ }
+                stmt.setInt(idx, size)
+                stmt.setInt(idx + 1, offset)
                 stmt.executeQuery().use { rs ->
                     val list = mutableListOf<Procedimento>()
                     while (rs.next()) {

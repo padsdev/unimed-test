@@ -204,7 +204,7 @@ Entregar modulos operacionais respeitando restricao tecnica de JDBC puro.
 - **M5-CP1**: camada JDBC pura para Atendimentos (Connection/PreparedStatement/ResultSet).
 - **M5-CP2**: camada JDBC pura para Procedimentos com regras de negocio.
 - **M5-CP3**: endpoints REST completos e documentados em Swagger.
-- **M5-CP4**: frontend Atendimentos/Procedimentos migrado de mock para API real.
+- **M5-CP4**: frontend Atendimentos/Procedimentos migrado de mock para API real + V4 seed (5 atendimentos + 5 procedimentos).
 
 ---
 

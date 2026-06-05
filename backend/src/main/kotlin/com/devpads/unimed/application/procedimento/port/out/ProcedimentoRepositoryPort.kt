@@ -5,7 +5,7 @@ import com.devpads.unimed.domain.procedimento.model.Procedimento
 
 interface ProcedimentoRepositoryPort {
     fun findById(id: Long): Procedimento?
-    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String): PagedResult<Procedimento>
+    fun findAll(page: Int, size: Int, sortField: String, sortDirection: String, atendimentoId: Long? = null): PagedResult<Procedimento>
     fun save(procedimento: Procedimento): Procedimento
     fun deleteById(id: Long)
     fun existsById(id: Long): Boolean

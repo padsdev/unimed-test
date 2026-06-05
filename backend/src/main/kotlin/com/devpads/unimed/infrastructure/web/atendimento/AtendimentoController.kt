@@ -37,6 +37,7 @@ class AtendimentoController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(defaultValue = "data_atendimento,desc") sort: List<String>,
+        @RequestParam(required = false) pacienteId: Long?,
     ): PagedResponse<AtendimentoResponse> {
         if (page < 0) {
             throw BadRequestException("page must be greater than or equal to 0")
@@ -46,7 +47,7 @@ class AtendimentoController(
         }
 
         val (sortField, sortDirection) = parseSort(sort.firstOrNull() ?: "data_atendimento,desc")
-        val result = atendimentoService.findAll(page, size, sortField, sortDirection)
+        val result = atendimentoService.findAll(page, size, sortField, sortDirection, pacienteId)
 
         return PagedResponse(
             items = result.items.map { it.toResponse() },

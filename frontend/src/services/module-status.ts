@@ -2,8 +2,8 @@ import type { ModuleStatus } from "@/types/domain";
 
 export const moduleStatus: Record<string, ModuleStatus> = {
   pacientes: "api",
-  atendimentos: "mock",
-  procedimentos: "mock",
+  atendimentos: "api",
+  procedimentos: "api",
   historico: "mock",
 };
 
