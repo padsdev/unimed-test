@@ -12,6 +12,7 @@ import com.devpads.unimed.infrastructure.web.procedimento.dto.toResponse
 import com.devpads.unimed.infrastructure.web.shared.dto.PagedResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -62,6 +64,7 @@ class ProcedimentoController(
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun createProcedimento(@Valid @RequestBody request: CreateProcedimentoRequest): ProcedimentoResponse {
         val command = CreateProcedimentoCommand(
             atendimentoId = request.atendimentoId,
@@ -87,6 +90,7 @@ class ProcedimentoController(
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteProcedimento(@PathVariable id: Long) {
         procedimentoService.delete(id)
     }

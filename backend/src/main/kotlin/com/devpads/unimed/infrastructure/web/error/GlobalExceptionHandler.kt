@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import java.net.URI
+import java.time.DateTimeException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -85,6 +86,7 @@ class GlobalExceptionHandler {
         MethodArgumentTypeMismatchException::class,
         MissingServletRequestParameterException::class,
         HttpMessageNotReadableException::class,
+        DateTimeException::class,
     )
     fun handleBadRequestExceptions(ex: Exception, request: HttpServletRequest): ProblemDetail {
         return buildProblem(

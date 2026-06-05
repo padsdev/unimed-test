@@ -508,8 +508,11 @@ components:
 
     AtualizarAtendimentoRequest:
       type: object
-      required: [dataAtendimento, medico, observacoes]
+      required: [pacienteId, dataAtendimento, medico, observacoes]
       properties:
+        pacienteId:
+          type: integer
+          example: 1
         dataAtendimento:
           type: string
           format: date-time
@@ -562,8 +565,11 @@ components:
 
     AtualizarProcedimentoRequest:
       type: object
-      required: [nome, valor]
+      required: [atendimentoId, nome, valor]
       properties:
+        atendimentoId:
+          type: integer
+          example: 10
         nome:
           type: string
           maxLength: 200
