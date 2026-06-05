@@ -108,6 +108,34 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
 
+  /pacientes/{pacienteId}/historico:
+    get:
+      operationId: "obterHistoricoPaciente"
+      summary: "Obt\u00e9m hist\u00f3rico consolidado do paciente"
+      tags: ["Hist\u00f3rico"]
+      parameters:
+        - name: "pacienteId"
+          in: "path"
+          required: true
+          schema:
+            type: integer
+        - name: "sortOrder"
+          in: "query"
+          required: false
+          schema:
+            type: string
+            default: "desc"
+            enum: ["asc", "desc"]
+      responses:
+        "200":
+          description: "Hist\u00f3rico consolidado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoricoPaciente"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /atendimentos:
     get:
       operationId: "listAtendimentos"

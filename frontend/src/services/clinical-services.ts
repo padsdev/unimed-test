@@ -299,27 +299,41 @@ function matchQuery(item: Record<string, unknown>, q: string): boolean {
   return Object.values(item).some((v) => String(v).toLowerCase().includes(lower));
 }
 
+function historicoGetByPaciente(pacienteId: number, sortOrder: "desc" | "asc" = "desc"): Promise<HistoricoPaciente> {
+  return fetch(`${API_BASE}/api/pacientes/${pacienteId}/historico?sortOrder=${sortOrder}`).then(handleResponse<HistoricoPaciente>);
+}
+
+function getHistoricoService() {
+  const status = moduleStatus.historico;
+  if (status === "api" || status === "hybrid") {
+    return { getByPaciente: historicoGetByPaciente };
+  }
+  return historicoMockService;
+}
+
+const historicoMockService = {
+  getByPaciente: (pacienteId: number, sortOrder: "desc" | "asc" = "desc"): Promise<HistoricoPaciente> => {
+    const paciente = pacientesMock.find((p) => p.id === pacienteId);
+    if (!paciente) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
+    const atendimentos = atendimentosMock.filter((a) => a.pacienteId === pacienteId);
+    atendimentos.sort((a, b) => {
+      const cmp = a.dataAtendimento.localeCompare(b.dataAtendimento);
+      return sortOrder === "desc" ? -cmp : cmp;
+    });
+    const historico: HistoricoPaciente = {
+      paciente,
+      atendimentos: atendimentos.map((a) => ({
+        ...a,
+        procedimentos: procedimentosMock.filter((p) => p.atendimentoId === a.id),
+      })),
+    };
+    return withMockLatency(historico);
+  },
+};
+
 export const clinicalServices = {
   pacientes: getPacientesService(),
   atendimentos: getAtendimentosService(),
   procedimentos: getProcedimentosService(),
-  historico: {
-    getByPaciente: (pacienteId: number, sortOrder: "desc" | "asc" = "desc"): Promise<HistoricoPaciente> => {
-      const paciente = pacientesMock.find((p) => p.id === pacienteId);
-      if (!paciente) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
-      const atendimentos = atendimentosMock.filter((a) => a.pacienteId === pacienteId);
-      atendimentos.sort((a, b) => {
-        const cmp = a.dataAtendimento.localeCompare(b.dataAtendimento);
-        return sortOrder === "desc" ? -cmp : cmp;
-      });
-      const historico: HistoricoPaciente = {
-        paciente,
-        atendimentos: atendimentos.map((a) => ({
-          ...a,
-          procedimentos: procedimentosMock.filter((p) => p.atendimentoId === a.id),
-        })),
-      };
-      return withMockLatency(historico);
-    },
-  },
+  historico: getHistoricoService(),
 };
