@@ -162,13 +162,13 @@ Entregar primeiro modulo real e substituir mock correspondente no frontend.
 
 ### Checkpoints de commit
 
-- **M4-CP1.1**: migracao Flyway V2 (CPF 11 digitos, email unique case-insensitive), OpenAPI atualizada, frontend sem status.
-- **M4-CP1.2**: PacienteRepositoryPort + PacienteRepositoryJpa (PostgreSQL), metodos existsByCpf/email.
-- **M4-CP1.3**: AtendimentoVinculoPort + MySQL adapter com JDBC puro, Testcontainers.
-- **M4-CP2.1**: PacienteService com create + update (validacao negocio em service).
-- **M4-CP2.2**: controller POST/PUT, DTOs com Bean Validation, testes unitarios service com mock.
-- **M4-CP3**: DELETE /api/pacientes/{id} com validacao de vinculos (409 se atendimentos existentes).
-- **M4-CP4**: frontend Pacientes migrado de mock para API real.
+- **M4-CP1.1**: migracao Flyway V2 (CPF 11 digitos, email unique case-insensitive), OpenAPI atualizada, frontend sem status. (concluido)
+- **M4-CP1.2**: PacienteRepositoryPort + PacienteRepositoryJpa (PostgreSQL), metodos existsByCpf/email. (concluido)
+- **M4-CP1.3**: AtendimentoVinculoPort + MySQL adapter com JDBC puro, Testcontainers. (concluido)
+- **M4-CP2.1**: PacienteService com create + update (validacao negocio em service). (concluido)
+- **M4-CP2.2**: controller POST/PUT, DTOs com Bean Validation, testes unitarios service com mock. (concluido)
+- **M4-CP3**: DELETE /api/pacientes/{id} com validacao de vinculos (409 se atendimentos existentes). (concluido)
+- **M4-CP4**: frontend Pacientes migrado de mock para API real. (proximo)
 - **M4-CP5**: atualizacao de Swagger + testes/validacao fim a fim.
 
 ---
