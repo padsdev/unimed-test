@@ -1,5 +1,6 @@
 package com.devpads.unimed.paciente.service
 
+import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import com.devpads.unimed.application.paciente.service.CreatePacienteCommand
 import com.devpads.unimed.application.paciente.service.PacienteService
@@ -25,11 +26,14 @@ class PacienteServiceTest {
     @Mock
     private lateinit var pacienteRepository: PacienteRepositoryPort
 
+    @Mock
+    private lateinit var atendimentoVinculoPort: AtendimentoVinculoPort
+
     private lateinit var pacienteService: PacienteService
 
     @BeforeEach
     fun setup() {
-        pacienteService = PacienteService(pacienteRepository)
+        pacienteService = PacienteService(pacienteRepository, atendimentoVinculoPort)
     }
 
     @Test
@@ -228,6 +232,51 @@ class PacienteServiceTest {
 
         assertThrows(UnprocessableEntityException::class.java) {
             pacienteService.update(1L, command)
+        }
+    }
+
+    @Test
+    fun delete_shouldDeletePaciente_whenNoVinculos() {
+        val existingPaciente = Paciente(
+            id = 1L,
+            nome = "João Silva",
+            cpf = "12345678901",
+            dataNascimento = LocalDate.of(1990, 1, 1),
+            telefone = "11999999999",
+            email = "joao@email.com",
+        )
+
+        whenever(pacienteRepository.findById(1L)).thenReturn(existingPaciente)
+        whenever(atendimentoVinculoPort.existsByPacienteId(1L)).thenReturn(false)
+
+        pacienteService.delete(1L)
+    }
+
+    @Test
+    fun delete_shouldThrowNotFound_whenPacienteNotExists() {
+        whenever(pacienteRepository.findById(999L)).thenReturn(null)
+
+        assertThrows(NotFoundException::class.java) {
+            pacienteService.delete(999L)
+        }
+    }
+
+    @Test
+    fun delete_shouldThrowConflict_whenVinculosExist() {
+        val existingPaciente = Paciente(
+            id = 1L,
+            nome = "João Silva",
+            cpf = "12345678901",
+            dataNascimento = LocalDate.of(1990, 1, 1),
+            telefone = "11999999999",
+            email = "joao@email.com",
+        )
+
+        whenever(pacienteRepository.findById(1L)).thenReturn(existingPaciente)
+        whenever(atendimentoVinculoPort.existsByPacienteId(1L)).thenReturn(true)
+
+        assertThrows(ConflictException::class.java) {
+            pacienteService.delete(1L)
         }
     }
 }

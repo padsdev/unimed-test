@@ -1,5 +1,6 @@
 package com.devpads.unimed
 
+import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,6 +16,9 @@ class UnimedApplicationTests {
 
 	@MockitoBean
 	lateinit var pacienteRepositoryPort: PacienteRepositoryPort
+
+	@MockitoBean
+	lateinit var atendimentoVinculoPort: AtendimentoVinculoPort
 
 	@Test
 	fun contextLoads() {

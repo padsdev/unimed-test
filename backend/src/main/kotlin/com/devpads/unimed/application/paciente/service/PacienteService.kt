@@ -1,5 +1,6 @@
 package com.devpads.unimed.application.paciente.service
 
+import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import com.devpads.unimed.application.shared.exception.ConflictException
 import com.devpads.unimed.application.shared.exception.NotFoundException
@@ -14,6 +15,7 @@ import java.time.LocalDate
 @Service
 class PacienteService(
     private val pacienteRepository: PacienteRepositoryPort,
+    private val atendimentoVinculoPort: AtendimentoVinculoPort,
 ) {
     fun findById(id: Long): Paciente? = pacienteRepository.findById(id)
 
@@ -114,6 +116,20 @@ class PacienteService(
         )
 
         return pacienteRepository.save(paciente)
+    }
+
+    fun delete(id: Long) {
+        val existing = pacienteRepository.findById(id)
+            ?: throw NotFoundException("Paciente com id=$id não encontrado")
+
+        if (atendimentoVinculoPort.existsByPacienteId(id)) {
+            throw ConflictException(
+                "Paciente possui atendimentos vinculados",
+                violations = listOf(UnimedViolation("id", "Paciente possui atendimentos vinculados", "conflict")),
+            )
+        }
+
+        pacienteRepository.deleteById(id)
     }
 }
 
