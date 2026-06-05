@@ -227,8 +227,8 @@ export default function Home() {
         description="Visão interativa com próximos, últimos, ações rápidas por dia e últimos procedimentos."
       >
         <div className="space-y-4">
-          <div className="grid min-h-[42rem] grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
-          <div className="rounded-xl border border-[color:var(--border-200)] bg-[color:var(--surface-1)] p-3 h-138">
+          <div className="grid min-h-[30rem] grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
+          <div className="rounded-xl border border-[color:var(--border-200)] bg-[color:var(--surface-1)] p-3">
             <div className="mb-3 flex items-center justify-between gap-2">
               <button
                 type="button"
@@ -398,11 +398,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-[color:var(--border-200)] bg-[color:var(--surface-2)] p-3 h-52">
+                <div className="rounded-xl border border-[color:var(--border-200)] bg-[color:var(--surface-2)] p-3">
                   <p className="mb-2 text-xs font-semibold uppercase text-[color:var(--text-500)]">
                     Últimos atendimentos
                   </p>
-                  <div className="h-[10.75rem] space-y-2 overflow-auto pr-1">
+                  <div className="max-h-[15rem] space-y-2 overflow-auto pr-1">
                     {ultimosAtendimentos.length === 0 ? (
                       <p className="text-xs text-[color:var(--text-400)]">Sem registros.</p>
                     ) : (

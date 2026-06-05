@@ -17,6 +17,100 @@ import type {
 
 import { withMockLatency } from "./api-client";
 import { atendimentosMock, novoIdAtendimento, novoIdPaciente, novoIdProcedimento, pacientesMock, procedimentosMock } from "./mock-data";
+import { moduleStatus } from "./module-status";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+async function handleResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    const msg = body?.detail ?? body?.title ?? `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  if (res.status === 204) return undefined as T;
+  return res.json();
+}
+
+function pacientesList(filters: PacientesFilters): Promise<PagedResponse<Paciente>> {
+  const params = new URLSearchParams();
+  params.set("page", String(filters.page ?? 0));
+  params.set("size", String(filters.size ?? 20));
+  if (filters.q) params.set("q", filters.q);
+  return fetch(`${API_BASE}/api/pacientes?${params}`).then(handleResponse<PagedResponse<Paciente>>);
+}
+
+function pacientesGetById(id: number): Promise<Paciente> {
+  return fetch(`${API_BASE}/api/pacientes/${id}`).then(handleResponse<Paciente>);
+}
+
+function pacientesCreate(data: CriarPacienteRequest): Promise<Paciente> {
+  return fetch(`${API_BASE}/api/pacientes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).then(handleResponse<Paciente>);
+}
+
+function pacientesUpdate(id: number, data: AtualizarPacienteRequest): Promise<Paciente> {
+  return fetch(`${API_BASE}/api/pacientes/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }).then(handleResponse<Paciente>);
+}
+
+function pacientesDelete(id: number): Promise<void> {
+  return fetch(`${API_BASE}/api/pacientes/${id}`, { method: "DELETE" }).then(handleResponse<void>);
+}
+
+function getPacientesService() {
+  const status = moduleStatus.pacientes;
+  if (status === "api" || status === "hybrid") {
+    return {
+      list: pacientesList,
+      getById: pacientesGetById,
+      create: pacientesCreate,
+      update: pacientesUpdate,
+      delete: pacientesDelete,
+    };
+  }
+  return pacientesMockService;
+}
+
+const pacientesMockService = {
+  list: (filters: PacientesFilters): Promise<PagedResponse<Paciente>> => {
+    const { q, ...pagination } = filters;
+    let filtered = pacientesMock;
+    if (q) {
+      filtered = filtered.filter((p) => matchQuery(p as unknown as Record<string, unknown>, q));
+    }
+    return withMockLatency(paginate(filtered, pagination));
+  },
+  getById: (id: number): Promise<Paciente> => {
+    const found = pacientesMock.find((p) => p.id === id);
+    if (!found) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
+    return withMockLatency(found);
+  },
+  create: (data: CriarPacienteRequest): Promise<Paciente> => {
+    const novo: Paciente = { id: novoIdPaciente(), ...data };
+    pacientesMock.push(novo);
+    return withMockLatency(novo);
+  },
+  update: (id: number, data: AtualizarPacienteRequest): Promise<Paciente> => {
+    const index = pacientesMock.findIndex((p) => p.id === id);
+    if (index === -1) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
+    pacientesMock[index] = { ...pacientesMock[index], ...data };
+    return withMockLatency(pacientesMock[index]);
+  },
+  delete: (id: number): Promise<void> => {
+    const index = pacientesMock.findIndex((p) => p.id === id);
+    if (index === -1) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
+    const hasVinculos = atendimentosMock.some((a) => a.pacienteId === id);
+    if (hasVinculos) return Promise.reject(new Error("Paciente possui v\u00ednculos ativos"));
+    pacientesMock.splice(index, 1);
+    return withMockLatency(undefined);
+  },
+};
 
 function paginate<T>(items: T[], filters: { page?: number; size?: number }): PagedResponse<T> {
   const page = filters.page ?? 0;
@@ -38,40 +132,7 @@ function matchQuery(item: Record<string, unknown>, q: string): boolean {
 }
 
 export const clinicalServices = {
-  pacientes: {
-    list: (filters: PacientesFilters): Promise<PagedResponse<Paciente>> => {
-      const { q, ...pagination } = filters;
-      let filtered = pacientesMock;
-      if (q) {
-        filtered = filtered.filter((p) => matchQuery(p as unknown as Record<string, unknown>, q));
-      }
-      return withMockLatency(paginate(filtered, pagination));
-    },
-    getById: (id: number): Promise<Paciente> => {
-      const found = pacientesMock.find((p) => p.id === id);
-      if (!found) return Promise.reject(new Error("Paciente não encontrado"));
-      return withMockLatency(found);
-    },
-    create: (data: CriarPacienteRequest): Promise<Paciente> => {
-      const novo: Paciente = { id: novoIdPaciente(), ...data };
-      pacientesMock.push(novo);
-      return withMockLatency(novo);
-    },
-    update: (id: number, data: AtualizarPacienteRequest): Promise<Paciente> => {
-      const index = pacientesMock.findIndex((p) => p.id === id);
-      if (index === -1) return Promise.reject(new Error("Paciente não encontrado"));
-      pacientesMock[index] = { ...pacientesMock[index], ...data };
-      return withMockLatency(pacientesMock[index]);
-    },
-    delete: (id: number): Promise<void> => {
-      const index = pacientesMock.findIndex((p) => p.id === id);
-      if (index === -1) return Promise.reject(new Error("Paciente não encontrado"));
-      const hasVinculos = atendimentosMock.some((a) => a.pacienteId === id);
-      if (hasVinculos) return Promise.reject(new Error("Paciente possui vínculos ativos"));
-      pacientesMock.splice(index, 1);
-      return withMockLatency(undefined);
-    },
-  },
+  pacientes: getPacientesService(),
   atendimentos: {
     list: (filters: AtendimentosFilters): Promise<PagedResponse<Atendimento>> => {
       const { q, pacienteId, ...pagination } = filters;
@@ -86,7 +147,7 @@ export const clinicalServices = {
     },
     getById: (id: number): Promise<Atendimento> => {
       const found = atendimentosMock.find((a) => a.id === id);
-      if (!found) return Promise.reject(new Error("Atendimento não encontrado"));
+      if (!found) return Promise.reject(new Error("Atendimento n\u00e3o encontrado"));
       return withMockLatency(found);
     },
     create: (data: CriarAtendimentoRequest): Promise<Atendimento> => {
@@ -96,13 +157,13 @@ export const clinicalServices = {
     },
     update: (id: number, data: AtualizarAtendimentoRequest): Promise<Atendimento> => {
       const index = atendimentosMock.findIndex((a) => a.id === id);
-      if (index === -1) return Promise.reject(new Error("Atendimento não encontrado"));
+      if (index === -1) return Promise.reject(new Error("Atendimento n\u00e3o encontrado"));
       atendimentosMock[index] = { ...atendimentosMock[index], ...data };
       return withMockLatency(atendimentosMock[index]);
     },
     delete: (id: number): Promise<void> => {
       const index = atendimentosMock.findIndex((a) => a.id === id);
-      if (index === -1) return Promise.reject(new Error("Atendimento não encontrado"));
+      if (index === -1) return Promise.reject(new Error("Atendimento n\u00e3o encontrado"));
       for (let i = procedimentosMock.length - 1; i >= 0; i--) {
         if (procedimentosMock[i].atendimentoId === id) {
           procedimentosMock.splice(i, 1);
@@ -126,7 +187,7 @@ export const clinicalServices = {
     },
     getById: (id: number): Promise<Procedimento> => {
       const found = procedimentosMock.find((p) => p.id === id);
-      if (!found) return Promise.reject(new Error("Procedimento não encontrado"));
+      if (!found) return Promise.reject(new Error("Procedimento n\u00e3o encontrado"));
       return withMockLatency(found);
     },
     create: (data: CriarProcedimentoRequest): Promise<Procedimento> => {
@@ -136,13 +197,13 @@ export const clinicalServices = {
     },
     update: (id: number, data: AtualizarProcedimentoRequest): Promise<Procedimento> => {
       const index = procedimentosMock.findIndex((p) => p.id === id);
-      if (index === -1) return Promise.reject(new Error("Procedimento não encontrado"));
+      if (index === -1) return Promise.reject(new Error("Procedimento n\u00e3o encontrado"));
       procedimentosMock[index] = { ...procedimentosMock[index], ...data };
       return withMockLatency(procedimentosMock[index]);
     },
     delete: (id: number): Promise<void> => {
       const index = procedimentosMock.findIndex((p) => p.id === id);
-      if (index === -1) return Promise.reject(new Error("Procedimento não encontrado"));
+      if (index === -1) return Promise.reject(new Error("Procedimento n\u00e3o encontrado"));
       procedimentosMock.splice(index, 1);
       return withMockLatency(undefined);
     },
@@ -150,7 +211,7 @@ export const clinicalServices = {
   historico: {
     getByPaciente: (pacienteId: number, sortOrder: "desc" | "asc" = "desc"): Promise<HistoricoPaciente> => {
       const paciente = pacientesMock.find((p) => p.id === pacienteId);
-      if (!paciente) return Promise.reject(new Error("Paciente não encontrado"));
+      if (!paciente) return Promise.reject(new Error("Paciente n\u00e3o encontrado"));
       const atendimentos = atendimentosMock.filter((a) => a.pacienteId === pacienteId);
       atendimentos.sort((a, b) => {
         const cmp = a.dataAtendimento.localeCompare(b.dataAtendimento);
