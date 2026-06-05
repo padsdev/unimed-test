@@ -3,6 +3,7 @@ package com.devpads.unimed
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
+import com.devpads.unimed.application.procedimento.port.out.ProcedimentoRepositoryPort
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.bean.override.mockito.MockitoBean
@@ -23,6 +24,9 @@ class UnimedApplicationTests {
 
 	@MockitoBean
 	lateinit var atendimentoRepositoryPort: AtendimentoRepositoryPort
+
+	@MockitoBean
+	lateinit var procedimentoRepositoryPort: ProcedimentoRepositoryPort
 
 	@Test
 	fun contextLoads() {

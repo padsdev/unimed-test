@@ -2,6 +2,7 @@ package com.devpads.unimed.paciente
 
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
+import com.devpads.unimed.application.procedimento.port.out.ProcedimentoRepositoryPort
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -38,6 +39,9 @@ class PacienteRepositoryIntegrationTest {
 
     @MockitoBean
     private lateinit var atendimentoRepositoryPort: AtendimentoRepositoryPort
+
+    @MockitoBean
+    private lateinit var procedimentoRepositoryPort: ProcedimentoRepositoryPort
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate

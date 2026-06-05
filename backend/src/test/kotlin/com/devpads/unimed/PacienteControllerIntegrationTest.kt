@@ -2,6 +2,7 @@ package com.devpads.unimed
 
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
+import com.devpads.unimed.application.procedimento.port.out.ProcedimentoRepositoryPort
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -57,6 +58,9 @@ class PacienteControllerIntegrationTest {
 
     @MockitoBean
     private lateinit var atendimentoRepositoryPort: AtendimentoRepositoryPort
+
+    @MockitoBean
+    private lateinit var procedimentoRepositoryPort: ProcedimentoRepositoryPort
 
     private fun url(path: String) = "http://localhost:$port/api$path"
 
