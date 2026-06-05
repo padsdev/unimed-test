@@ -2,6 +2,7 @@ package com.devpads.unimed
 
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
+import com.devpads.unimed.application.historico.port.out.HistoricoRepositoryPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import com.devpads.unimed.application.procedimento.port.out.ProcedimentoRepositoryPort
 import com.devpads.unimed.application.shared.PagedResult
@@ -53,6 +54,9 @@ class AtendimentoControllerIntegrationTest {
 
     @MockitoBean
     private lateinit var procedimentoRepositoryPort: ProcedimentoRepositoryPort
+
+    @MockitoBean
+    private lateinit var historicoRepositoryPort: HistoricoRepositoryPort
 
     private fun url(path: String) = "http://localhost:$port/api$path"
 
