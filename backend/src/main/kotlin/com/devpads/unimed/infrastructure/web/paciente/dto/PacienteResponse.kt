@@ -10,7 +10,6 @@ data class PacienteResponse(
     val dataNascimento: LocalDate,
     val telefone: String,
     val email: String,
-    val status: String,
 )
 
 fun Paciente.toResponse(): PacienteResponse = PacienteResponse(
@@ -20,5 +19,4 @@ fun Paciente.toResponse(): PacienteResponse = PacienteResponse(
     dataNascimento = dataNascimento,
     telefone = telefone,
     email = email,
-    status = status,
 )

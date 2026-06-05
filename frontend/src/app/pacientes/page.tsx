@@ -92,7 +92,6 @@ export default function PacientesPage() {
                     <th className="px-3 py-2.5 font-semibold">CPF</th>
                     <th className="px-3 py-2.5 font-semibold">Telefone</th>
                     <th className="px-3 py-2.5 font-semibold">Email</th>
-                    <th className="px-3 py-2.5 font-semibold">Status</th>
                     <th className="w-20 px-3 py-2.5" />
                   </tr>
                 </thead>
@@ -103,13 +102,6 @@ export default function PacientesPage() {
                       <td className="px-3 py-2.5">{item.cpf}</td>
                       <td className="px-3 py-2.5">{item.telefone}</td>
                       <td className="px-3 py-2.5">{item.email}</td>
-                      <td className="px-3 py-2.5">
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                          item.status === "ativo" ? "bg-[color:var(--success-500)]/10 text-[color:var(--success-500)]" : "bg-[color:var(--danger-500)]/10 text-[color:var(--danger-500)]"
-                        }`}>
-                          {item.status}
-                        </span>
-                      </td>
                       <td className="flex items-center gap-1 px-3 py-2.5">
                         <button
                           type="button"
@@ -147,7 +139,6 @@ export default function PacientesPage() {
             <div><p className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Nascimento</p><p className="text-sm text-[color:var(--text-900)]">{viewData.dataNascimento}</p></div>
             <div><p className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Telefone</p><p className="text-sm text-[color:var(--text-900)]">{viewData.telefone}</p></div>
             <div><p className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Email</p><p className="text-sm text-[color:var(--text-900)]">{viewData.email}</p></div>
-            <div><p className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Status</p><p className="text-sm text-[color:var(--text-900)]">{viewData.status}</p></div>
           </div>
         ) : (
           <PacienteForm
@@ -189,14 +180,12 @@ function PacienteForm({
   const [dataNascimento, setDataNascimento] = useState(defaultValues?.dataNascimento ?? "");
   const [telefone, setTelefone] = useState(defaultValues?.telefone ?? "");
   const [email, setEmail] = useState(defaultValues?.email ?? "");
-  const [status, setStatus] = useState<"ativo" | "inativo">(defaultValues?.status ?? "ativo");
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === "create") {
       onSubmit({ nome, cpf, dataNascimento, telefone, email } as CriarPacienteRequest);
     } else {
-      onSubmit({ nome, dataNascimento, telefone, email, status } as AtualizarPacienteRequest);
+      onSubmit({ nome, dataNascimento, telefone, email } as AtualizarPacienteRequest);
     }
   }
 
@@ -208,7 +197,7 @@ function PacienteForm({
       </div>
       <div>
         <label className="text-xs font-semibold uppercase text-[color:var(--text-500)]">CPF</label>
-        <input type="text" value={cpf} onChange={(e) => setCpf(e.target.value)} required={mode === "create"} disabled={mode === "edit"} className="mt-1 w-full rounded-lg border border-border bg-[color:var(--surface-1)] px-3 py-2 text-sm text-[color:var(--text-700)] outline-none focus:border-[color:var(--brand-500)] disabled:opacity-50" placeholder="000.000.000-00" />
+        <input type="text" value={cpf} onChange={(e) => setCpf(e.target.value)} required={mode === "create"} disabled={mode === "edit"} className="mt-1 w-full rounded-lg border border-border bg-[color:var(--surface-1)] px-3 py-2 text-sm text-[color:var(--text-700)] outline-none focus:border-[color:var(--brand-500)] disabled:opacity-50" placeholder="12345678900" />
       </div>
       <div>
         <label className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Nascimento</label>
@@ -222,15 +211,6 @@ function PacienteForm({
         <label className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Email</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1 w-full rounded-lg border border-border bg-[color:var(--surface-1)] px-3 py-2 text-sm text-[color:var(--text-700)] outline-none focus:border-[color:var(--brand-500)]" />
       </div>
-      {mode === "edit" && (
-        <div>
-          <label className="text-xs font-semibold uppercase text-[color:var(--text-500)]">Status</label>
-          <select value={status} onChange={(e) => setStatus(e.target.value as "ativo" | "inativo")} className="mt-1 w-full rounded-lg border border-border bg-[color:var(--surface-1)] px-3 py-2 text-sm text-[color:var(--text-700)] outline-none focus:border-[color:var(--brand-500)]">
-            <option value="ativo">Ativo</option>
-            <option value="inativo">Inativo</option>
-          </select>
-        </div>
-      )}
       <div className="flex justify-end gap-3 pt-2">
         <Button type="submit" disabled={loading}>{loading ? "Salvando..." : "Salvar"}</Button>
       </div>

@@ -20,6 +20,4 @@ data class PacienteEntity(
     val telefone: String,
 
     val email: String,
-
-    val status: String = "ativo",
 )

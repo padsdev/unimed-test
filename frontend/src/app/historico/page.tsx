@@ -82,11 +82,6 @@ export default function HistoricoPage() {
                   <span>CPF {historico.paciente.cpf}</span>
                   <span>Nasc. {historico.paciente.dataNascimento}</span>
                   <span>{historico.paciente.telefone}</span>
-                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                    historico.paciente.status === "ativo" ? "bg-[color:var(--success-500)]/10 text-[color:var(--success-500)]" : "bg-[color:var(--danger-500)]/10 text-[color:var(--danger-500)]"
-                  }`}>
-                    {historico.paciente.status}
-                  </span>
                 </div>
               </header>
 

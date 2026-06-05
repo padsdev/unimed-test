@@ -398,7 +398,7 @@ components:
     # ─── Paciente ──────────────────────────────────────────────
     Paciente:
       type: object
-      required: [id, nome, cpf, dataNascimento, telefone, email, status]
+      required: [id, nome, cpf, dataNascimento, telefone, email]
       properties:
         id:
           type: integer
@@ -408,7 +408,8 @@ components:
           example: "João da Silva"
         cpf:
           type: string
-          example: "123.456.789-00"
+          pattern: "^\\d{11}$"
+          example: "12345678900"
         dataNascimento:
           type: string
           format: date
@@ -420,11 +421,6 @@ components:
           type: string
           format: email
           example: "joao.silva@email.com"
-        status:
-          type: string
-          enum: [ativo, inativo]
-          example: ativo
-
     CriarPacienteRequest:
       type: object
       required: [nome, cpf, dataNascimento, telefone, email]
@@ -435,8 +431,8 @@ components:
           example: "João da Silva"
         cpf:
           type: string
-          pattern: "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$"
-          example: "123.456.789-00"
+          pattern: "^\\d{11}$"
+          example: "12345678900"
         dataNascimento:
           type: string
           format: date
@@ -451,7 +447,7 @@ components:
 
     AtualizarPacienteRequest:
       type: object
-      required: [nome, dataNascimento, telefone, email, status]
+      required: [nome, dataNascimento, telefone, email]
       properties:
         nome:
           type: string
@@ -468,11 +464,6 @@ components:
           type: string
           format: email
           example: "joao.silva@email.com"
-        status:
-          type: string
-          enum: [ativo, inativo]
-          example: ativo
-
     # ─── Atendimento ───────────────────────────────────────────
     Atendimento:
       type: object

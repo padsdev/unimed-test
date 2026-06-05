@@ -9,7 +9,6 @@ export interface Paciente {
   dataNascimento: string;
   telefone: string;
   email: string;
-  status: "ativo" | "inativo";
 }
 
 export interface CriarPacienteRequest {
@@ -25,7 +24,6 @@ export interface AtualizarPacienteRequest {
   dataNascimento: string;
   telefone: string;
   email: string;
-  status: "ativo" | "inativo";
 }
 
 export interface Atendimento {

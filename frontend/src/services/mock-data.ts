@@ -5,11 +5,11 @@ let nextAtendimentoId = 20;
 let nextProcedimentoId = 200;
 
 export const pacientesMock: Paciente[] = [
-  { id: 1, nome: "João da Silva", cpf: "123.456.789-00", dataNascimento: "1985-03-15", telefone: "(11) 98888-1111", email: "joao.silva@email.com", status: "ativo" },
-  { id: 2, nome: "Maria Oliveira", cpf: "987.654.321-00", dataNascimento: "1992-07-22", telefone: "(11) 97777-2222", email: "maria.oliveira@email.com", status: "ativo" },
-  { id: 3, nome: "Carlos Pereira", cpf: "456.789.123-00", dataNascimento: "1978-11-02", telefone: "(11) 96666-3333", email: "carlos.pereira@email.com", status: "ativo" },
-  { id: 4, nome: "Ana Costa", cpf: "321.654.987-00", dataNascimento: "1995-01-30", telefone: "(11) 95555-4444", email: "ana.costa@email.com", status: "inativo" },
-  { id: 5, nome: "Pedro Santos", cpf: "789.123.456-00", dataNascimento: "1980-09-12", telefone: "(11) 94444-5555", email: "pedro.santos@email.com", status: "ativo" },
+  { id: 1, nome: "João da Silva", cpf: "12345678900", dataNascimento: "1985-03-15", telefone: "(11) 98888-1111", email: "joao.silva@email.com" },
+  { id: 2, nome: "Maria Oliveira", cpf: "98765432100", dataNascimento: "1992-07-22", telefone: "(11) 97777-2222", email: "maria.oliveira@email.com" },
+  { id: 3, nome: "Carlos Pereira", cpf: "45678912300", dataNascimento: "1978-11-02", telefone: "(11) 96666-3333", email: "carlos.pereira@email.com" },
+  { id: 4, nome: "Ana Costa", cpf: "32165498700", dataNascimento: "1995-01-30", telefone: "(11) 95555-4444", email: "ana.costa@email.com" },
+  { id: 5, nome: "Pedro Santos", cpf: "78912345600", dataNascimento: "1980-09-12", telefone: "(11) 94444-5555", email: "pedro.santos@email.com" },
 ];
 
 export const atendimentosMock: Atendimento[] = [

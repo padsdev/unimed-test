@@ -53,7 +53,7 @@ export const clinicalServices = {
       return withMockLatency(found);
     },
     create: (data: CriarPacienteRequest): Promise<Paciente> => {
-      const novo: Paciente = { id: novoIdPaciente(), ...data, status: "ativo" };
+      const novo: Paciente = { id: novoIdPaciente(), ...data };
       pacientesMock.push(novo);
       return withMockLatency(novo);
     },
