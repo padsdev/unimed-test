@@ -1,5 +1,6 @@
 package com.devpads.unimed.paciente
 
+import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -33,6 +35,9 @@ class PacienteRepositoryIntegrationTest {
 
     @Autowired
     private lateinit var repository: PacienteRepositoryPort
+
+    @MockitoBean
+    private lateinit var atendimentoRepositoryPort: AtendimentoRepositoryPort
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate

@@ -1,5 +1,6 @@
 package com.devpads.unimed
 
+import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoVinculoPort
 import com.devpads.unimed.application.paciente.port.out.PacienteRepositoryPort
 import org.junit.jupiter.api.Test
@@ -19,6 +20,9 @@ class UnimedApplicationTests {
 
 	@MockitoBean
 	lateinit var atendimentoVinculoPort: AtendimentoVinculoPort
+
+	@MockitoBean
+	lateinit var atendimentoRepositoryPort: AtendimentoRepositoryPort
 
 	@Test
 	fun contextLoads() {
