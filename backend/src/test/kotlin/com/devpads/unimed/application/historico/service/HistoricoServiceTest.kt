@@ -9,6 +9,7 @@ import com.devpads.unimed.domain.procedimento.model.Procedimento
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -72,6 +73,40 @@ class HistoricoServiceTest {
         assertEquals(1, result.procedimentos.size)
         assertEquals(atendimento.id, result.atendimentos[0].id)
         assertEquals(procedimento.id, result.procedimentos[0].id)
+    }
+
+    @Test
+    fun `should return historico when paciente exists with atendimentos and procedimentos ASC`() {
+        val atendimento2 = Atendimento(
+            id = 20L,
+            pacienteId = pacienteId,
+            dataAtendimento = Instant.parse("2026-06-01T14:30:00Z"),
+            medico = "Dr. Carlos",
+            observacoes = "Retorno",
+        )
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+        whenever(historicoRepository.findAtendimentosByPacienteId(pacienteId, "ASC"))
+            .thenReturn(listOf(atendimento, atendimento2))
+        whenever(historicoRepository.findProcedimentosByAtendimentoIds(listOf(10L, 20L))).thenReturn(listOf(procedimento))
+
+        val result = service.getHistorico(pacienteId, "asc")
+
+        assertNotNull(result)
+        assertEquals(2, result.atendimentos.size)
+        assertTrue(result.atendimentos[0].dataAtendimento <= result.atendimentos[1].dataAtendimento)
+    }
+
+    @Test
+    fun `should return historico when atendimento exists without procedimentos`() {
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+        whenever(historicoRepository.findAtendimentosByPacienteId(pacienteId, "DESC")).thenReturn(listOf(atendimento))
+        whenever(historicoRepository.findProcedimentosByAtendimentoIds(listOf(10L))).thenReturn(emptyList())
+
+        val result = service.getHistorico(pacienteId, "desc")
+
+        assertNotNull(result)
+        assertEquals(1, result.atendimentos.size)
+        assertEquals(0, result.procedimentos.size)
     }
 
     @Test
