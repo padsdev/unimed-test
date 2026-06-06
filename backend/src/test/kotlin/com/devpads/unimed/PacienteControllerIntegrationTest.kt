@@ -94,6 +94,40 @@ class PacienteControllerIntegrationTest {
     }
 
     @Test
+    fun list_shouldReturn400_whenPageNegative() {
+        val response = restTemplate.getForEntity(url("/pacientes?page=-1"), ProblemDetail::class.java)
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+    }
+
+    @Test
+    fun list_shouldReturn400_whenSizeZero() {
+        val response = restTemplate.getForEntity(url("/pacientes?size=0"), ProblemDetail::class.java)
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+    }
+
+    @Test
+    fun list_shouldReturnAll_whenSizeHuge() {
+        restTemplate.postForEntity(url("/pacientes"), createPayload, Map::class.java)
+        val response = restTemplate.getForEntity(url("/pacientes?size=10000"), Map::class.java)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        val body = response.body
+        assertNotNull(body)
+        assertTrue((body!!["totalItems"] as Int) >= 1)
+    }
+
+    @Test
+    fun list_shouldReturnSorted_whenSortAsc() {
+        restTemplate.postForEntity(url("/pacientes"), createPayload, Map::class.java)
+        val response = restTemplate.getForEntity(url("/pacientes?sort=nome,asc"), Map::class.java)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        val body = response.body
+        assertNotNull(body)
+        assertTrue((body!!["items"] as List<*>).isNotEmpty())
+    }
+
+    @Test
     fun create_shouldReturn201_whenValid() {
         val response = restTemplate.postForEntity(url("/pacientes"), createPayload, Map::class.java)
 

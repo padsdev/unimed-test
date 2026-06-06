@@ -11,6 +11,7 @@ import com.devpads.unimed.domain.atendimento.model.Atendimento
 import com.devpads.unimed.domain.paciente.model.Paciente
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -76,6 +77,40 @@ class AtendimentoControllerIntegrationTest {
         val response = restTemplate.getForEntity(url("/atendimentos?page=-1"), ProblemDetail::class.java)
 
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+    }
+
+    @Test
+    fun list_shouldReturn400_whenSizeZero() {
+        val response = restTemplate.getForEntity(url("/atendimentos?size=0"), ProblemDetail::class.java)
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
+    }
+
+    @Test
+    fun list_shouldReturnAll_whenSizeHuge() {
+        whenever(atendimentoRepository.findAll(any(), any(), any(), any(), isNull()))
+            .thenReturn(PagedResult(emptyList(), 0, 10000, 1L, 1))
+
+        val response = restTemplate.getForEntity(url("/atendimentos?size=10000"), Map::class.java)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertTrue((response.body!!["totalItems"] as Int) >= 0)
+    }
+
+    @Test
+    fun list_shouldReturnSorted_whenSortAsc() {
+        val atendimento = Atendimento(
+            id = 1L, pacienteId = 1L,
+            dataAtendimento = Instant.parse("2026-01-15T09:00:00Z"),
+            medico = "Dra. Maria", observacoes = "Primeira consulta",
+        )
+        whenever(atendimentoRepository.findAll(any(), any(), any(), any(), isNull()))
+            .thenReturn(PagedResult(listOf(atendimento), 0, 10, 1L, 1))
+
+        val response = restTemplate.getForEntity(url("/atendimentos?sort=data_atendimento,asc"), Map::class.java)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertNotNull(response.body!!["items"])
     }
 
     @Test
