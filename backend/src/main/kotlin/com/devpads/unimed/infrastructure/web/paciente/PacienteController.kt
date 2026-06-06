@@ -36,7 +36,7 @@ class PacienteController(
     fun listPacientes(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam(defaultValue = "nome,asc") sort: List<String>,
+        @RequestParam(defaultValue = "nome,asc") sort: String,
     ): PagedResponse<PacienteResponse> {
         if (page < 0) {
             throw BadRequestException("page must be greater than or equal to 0")
@@ -98,22 +98,20 @@ class PacienteController(
         pacienteService.delete(id)
     }
 
-    private fun toSort(values: List<String>): Sort {
-        val orders = values.map { rawSort ->
-            val parts = rawSort.split(",", limit = 2)
-            val property = parts[0].trim()
-            if (property.isBlank()) {
-                throw BadRequestException("sort field cannot be empty")
-            }
-
-            val direction = parts.getOrElse(1) { "asc" }.trim().lowercase()
-            when (direction) {
-                "asc" -> Sort.Order.asc(property)
-                "desc" -> Sort.Order.desc(property)
-                else -> throw BadRequestException("sort direction must be asc or desc")
-            }
+    private fun toSort(value: String): Sort {
+        val parts = value.split(",", limit = 2)
+        val property = parts[0].trim()
+        if (property.isBlank()) {
+            throw BadRequestException("sort field cannot be empty")
         }
 
-        return Sort.by(orders)
+        val direction = parts.getOrElse(1) { "asc" }.trim().lowercase()
+        val order = when (direction) {
+            "asc" -> Sort.Order.asc(property)
+            "desc" -> Sort.Order.desc(property)
+            else -> throw BadRequestException("sort direction must be asc or desc")
+        }
+
+        return Sort.by(order)
     }
 }

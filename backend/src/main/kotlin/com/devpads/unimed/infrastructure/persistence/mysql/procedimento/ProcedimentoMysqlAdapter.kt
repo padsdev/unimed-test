@@ -3,23 +3,23 @@ package com.devpads.unimed.infrastructure.persistence.mysql.procedimento
 import com.devpads.unimed.application.shared.PagedResult
 import com.devpads.unimed.domain.procedimento.model.Procedimento
 import com.devpads.unimed.application.procedimento.port.out.ProcedimentoRepositoryPort
+import com.devpads.unimed.infrastructure.config.MysqlJdbcConnectionFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.math.BigDecimal
-import javax.sql.DataSource
 
 @Repository
 @ConditionalOnProperty(name = ["infra.mysql.enabled"], havingValue = "true")
 class ProcedimentoMysqlAdapter(
-    private val mysqlDataSource: DataSource,
+    private val mysqlJdbcConnectionFactory: MysqlJdbcConnectionFactory,
 ) : ProcedimentoRepositoryPort {
 
     private val allowedSortFields = setOf("id", "atendimento_id", "nome", "valor")
 
     override fun findById(id: Long): Procedimento? {
         val sql = "SELECT id, atendimento_id, nome, valor FROM procedimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeQuery().use { rs ->
@@ -36,7 +36,7 @@ class ProcedimentoMysqlAdapter(
         val whereClause = if (atendimentoId != null) " WHERE atendimento_id = ?" else ""
 
         val countSql = "SELECT COUNT(*) FROM procedimentos$whereClause"
-        val totalItems: Long = mysqlDataSource.connection.use { conn ->
+        val totalItems: Long = mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(countSql).use { stmt ->
                 if (atendimentoId != null) stmt.setLong(1, atendimentoId)
                 stmt.executeQuery().use { rs ->
@@ -46,7 +46,7 @@ class ProcedimentoMysqlAdapter(
         }
 
         val dataSql = "SELECT id, atendimento_id, nome, valor FROM procedimentos$whereClause ORDER BY $safeField $safeDir LIMIT ? OFFSET ?"
-        val items = mysqlDataSource.connection.use { conn ->
+        val items = mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(dataSql).use { stmt ->
                 var idx = 1
                 if (atendimentoId != null) { stmt.setLong(idx, atendimentoId); idx++ }
@@ -69,7 +69,7 @@ class ProcedimentoMysqlAdapter(
     override fun save(procedimento: Procedimento): Procedimento {
         if (procedimento.id == null) {
             val sql = "INSERT INTO procedimentos (atendimento_id, nome, valor) VALUES (?, ?, ?)"
-            mysqlDataSource.connection.use { conn ->
+            mysqlJdbcConnectionFactory.getConnection().use { conn ->
                 conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS).use { stmt ->
                     stmt.setLong(1, procedimento.atendimentoId)
                     stmt.setString(2, procedimento.nome)
@@ -88,7 +88,7 @@ class ProcedimentoMysqlAdapter(
             }
         } else {
             val sql = "UPDATE procedimentos SET atendimento_id = ?, nome = ?, valor = ? WHERE id = ?"
-            mysqlDataSource.connection.use { conn ->
+            mysqlJdbcConnectionFactory.getConnection().use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     stmt.setLong(1, procedimento.atendimentoId)
                     stmt.setString(2, procedimento.nome)
@@ -103,7 +103,7 @@ class ProcedimentoMysqlAdapter(
 
     override fun deleteById(id: Long) {
         val sql = "DELETE FROM procedimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeUpdate()
@@ -113,7 +113,7 @@ class ProcedimentoMysqlAdapter(
 
     override fun existsById(id: Long): Boolean {
         val sql = "SELECT COUNT(*) FROM procedimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeQuery().use { rs ->
@@ -125,7 +125,7 @@ class ProcedimentoMysqlAdapter(
 
     override fun findByAtendimentoId(atendimentoId: Long): List<Procedimento> {
         val sql = "SELECT id, atendimento_id, nome, valor FROM procedimentos WHERE atendimento_id = ? ORDER BY id"
-        return mysqlDataSource.connection.use { conn ->
+        return mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, atendimentoId)
                 stmt.executeQuery().use { rs ->

@@ -35,7 +35,7 @@ class ProcedimentoController(
     fun listProcedimentos(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam(defaultValue = "nome,asc") sort: List<String>,
+        @RequestParam(defaultValue = "nome,asc") sort: String,
         @RequestParam(required = false) atendimentoId: Long?,
     ): PagedResponse<ProcedimentoResponse> {
         if (page < 0) {
@@ -45,7 +45,7 @@ class ProcedimentoController(
             throw BadRequestException("size must be greater than or equal to 1")
         }
 
-        val (sortField, sortDirection) = parseSort(sort.firstOrNull() ?: "nome,asc")
+        val (sortField, sortDirection) = parseSort(sort)
         val result = procedimentoService.findAll(page, size, sortField, sortDirection, atendimentoId)
 
         return PagedResponse(

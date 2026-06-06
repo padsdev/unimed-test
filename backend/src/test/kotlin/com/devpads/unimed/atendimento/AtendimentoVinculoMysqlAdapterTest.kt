@@ -1,6 +1,7 @@
 package com.devpads.unimed.atendimento
 
 import com.devpads.unimed.infrastructure.persistence.mysql.atendimento.AtendimentoVinculoMysqlAdapter
+import com.devpads.unimed.infrastructure.config.MysqlJdbcConnectionFactory
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -45,7 +46,7 @@ class AtendimentoVinculoMysqlAdapterTest {
             }
         }
 
-        adapter = AtendimentoVinculoMysqlAdapter(dataSource)
+        adapter = AtendimentoVinculoMysqlAdapter(MysqlJdbcConnectionFactory(mysql.jdbcUrl, mysql.username, mysql.password))
     }
 
     @AfterEach

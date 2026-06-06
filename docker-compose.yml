@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16.3
+    network_mode: host
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-unimed_pacientes}
       POSTGRES_USER: ${POSTGRES_USER:-unimed}
@@ -16,16 +17,18 @@ services:
 
   mysql:
     image: mysql:8.4
+    network_mode: host
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-unimed_operacional}
       MYSQL_USER: ${MYSQL_USER:-unimed}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-unimed}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_TCP_PORT: ${MYSQL_TCP_PORT:-3307}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u${MYSQL_USER:-unimed} -p${MYSQL_PASSWORD:-unimed}"]
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -P${MYSQL_TCP_PORT:-3307} -u${MYSQL_USER:-unimed} -p${MYSQL_PASSWORD:-unimed} ${MYSQL_DATABASE:-unimed_operacional} -e 'SELECT 1' >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -35,20 +38,20 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      network: host
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-unimed_pacientes}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${POSTGRES_DB:-unimed_pacientes}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-unimed}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-unimed}
-      MYSQL_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-unimed_operacional}
+      MYSQL_URL: jdbc:mysql://localhost:${MYSQL_TCP_PORT:-3307}/${MYSQL_DATABASE:-unimed_operacional}
       MYSQL_USER: ${MYSQL_USER:-unimed}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-unimed}
+    network_mode: host
     depends_on:
       postgres:
         condition: service_healthy
       mysql:
         condition: service_healthy
-    ports:
-      - "8080:8080"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health >/dev/null || exit 1"]
       interval: 10s
@@ -60,13 +63,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      network: host
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8080
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    network_mode: host
     depends_on:
       backend:
         condition: service_healthy
-    ports:
-      - "3000:3000"
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:3000 || exit 1"]
       interval: 10s

@@ -36,7 +36,7 @@ class AtendimentoController(
     fun listAtendimentos(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
-        @RequestParam(defaultValue = "data_atendimento,desc") sort: List<String>,
+        @RequestParam(defaultValue = "data_atendimento,desc") sort: String,
         @RequestParam(required = false) pacienteId: Long?,
     ): PagedResponse<AtendimentoResponse> {
         if (page < 0) {
@@ -46,7 +46,7 @@ class AtendimentoController(
             throw BadRequestException("size must be greater than or equal to 1")
         }
 
-        val (sortField, sortDirection) = parseSort(sort.firstOrNull() ?: "data_atendimento,desc")
+        val (sortField, sortDirection) = parseSort(sort)
         val result = atendimentoService.findAll(page, size, sortField, sortDirection, pacienteId)
 
         return PagedResponse(

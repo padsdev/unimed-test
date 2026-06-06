@@ -3,25 +3,24 @@ package com.devpads.unimed.infrastructure.persistence.mysql.atendimento
 import com.devpads.unimed.application.shared.PagedResult
 import com.devpads.unimed.domain.atendimento.model.Atendimento
 import com.devpads.unimed.application.atendimento.port.out.AtendimentoRepositoryPort
+import com.devpads.unimed.infrastructure.config.MysqlJdbcConnectionFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import javax.sql.DataSource
 
 @Repository
 @ConditionalOnProperty(name = ["infra.mysql.enabled"], havingValue = "true")
 class AtendimentoMysqlAdapter(
-    private val mysqlDataSource: DataSource,
+    private val mysqlJdbcConnectionFactory: MysqlJdbcConnectionFactory,
 ) : AtendimentoRepositoryPort {
 
     private val allowedSortFields = setOf("id", "paciente_id", "data_atendimento", "medico")
 
     override fun findById(id: Long): Atendimento? {
         val sql = "SELECT id, paciente_id, data_atendimento, medico, observacoes FROM atendimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeQuery().use { rs ->
@@ -38,7 +37,7 @@ class AtendimentoMysqlAdapter(
         val whereClause = if (pacienteId != null) " WHERE paciente_id = ?" else ""
 
         val countSql = "SELECT COUNT(*) FROM atendimentos$whereClause"
-        val totalItems: Long = mysqlDataSource.connection.use { conn ->
+        val totalItems: Long = mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(countSql).use { stmt ->
                 if (pacienteId != null) stmt.setLong(1, pacienteId)
                 stmt.executeQuery().use { rs ->
@@ -48,7 +47,7 @@ class AtendimentoMysqlAdapter(
         }
 
         val dataSql = "SELECT id, paciente_id, data_atendimento, medico, observacoes FROM atendimentos$whereClause ORDER BY $safeField $safeDir LIMIT ? OFFSET ?"
-        val items = mysqlDataSource.connection.use { conn ->
+        val items = mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(dataSql).use { stmt ->
                 var idx = 1
                 if (pacienteId != null) { stmt.setLong(idx, pacienteId); idx++ }
@@ -74,7 +73,7 @@ class AtendimentoMysqlAdapter(
 
         if (atendimento.id == null) {
             val sql = "INSERT INTO atendimentos (paciente_id, data_atendimento, medico, observacoes) VALUES (?, ?, ?, ?)"
-            mysqlDataSource.connection.use { conn ->
+            mysqlJdbcConnectionFactory.getConnection().use { conn ->
                 conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS).use { stmt ->
                     stmt.setLong(1, atendimento.pacienteId)
                     stmt.setObject(2, localDateTime)
@@ -95,7 +94,7 @@ class AtendimentoMysqlAdapter(
             }
         } else {
             val sql = "UPDATE atendimentos SET paciente_id = ?, data_atendimento = ?, medico = ?, observacoes = ? WHERE id = ?"
-            mysqlDataSource.connection.use { conn ->
+            mysqlJdbcConnectionFactory.getConnection().use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     stmt.setLong(1, atendimento.pacienteId)
                     stmt.setObject(2, localDateTime)
@@ -111,7 +110,7 @@ class AtendimentoMysqlAdapter(
 
     override fun deleteById(id: Long) {
         val sql = "DELETE FROM atendimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeUpdate()
@@ -121,7 +120,7 @@ class AtendimentoMysqlAdapter(
 
     override fun existsById(id: Long): Boolean {
         val sql = "SELECT COUNT(*) FROM atendimentos WHERE id = ?"
-        mysqlDataSource.connection.use { conn ->
+        mysqlJdbcConnectionFactory.getConnection().use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setLong(1, id)
                 stmt.executeQuery().use { rs ->
