@@ -234,9 +234,8 @@ Entregar principal caso de integracao entre os dois bancos e refletir isso na UX
 
 ### Checkpoints de commit
 
-- **M6-CP1**: consolidacao backend paciente + atendimentos + procedimentos em resposta unica.
-- **M6-CP2**: estrategia anti N+1 aplicada na consulta MySQL.
-- **M6-CP3**: endpoint de historico documentado e frontend Historico consumindo API real.
+- **M6-CP1**: backend Historico consolidado (service, adapter MySQL anti N+1, controller, DTOs, unit/integration tests). (concluido)
+- **M6-CP2**: frontend Historico migrado de mock para API real + OpenAPI atualizado. (concluido)
 
 ---
 
@@ -260,10 +259,10 @@ Aumentar confiabilidade da aplicacao com cobertura de cenarios criticos.
 
 ### Checkpoints de commit
 
-- **M7-CP1**: testes unitarios de dominio/backend para regras criticas.
-- **M7-CP2**: testes de integracao dos endpoints principais.
-- **M7-CP3**: smoke test de stack completa (frontend + backend + bancos) em Docker.
-- **M7-CP4**: consolidacao de bugs encontrados e correcoes finais de estabilidade.
+- **M7-CP1**: HistoricoServiceTest expandido (6 testes, ASC/DESC/empty/edge) + GlobalExceptionHandlerTest (7 exceptions). (concluido)
+- **M7-CP2**: pagination/sort edge cases nos 3 integration tests (size=0, size huge, sort ASC, page negative). (concluido)
+- **M7-CP3**: scripts/smoke-test.sh — 8 endpoints via curl contra docker-compose. (concluido)
+- **M7-CP4**: verificacao final (backend 112 tests pass, frontend lint/build clean) + milestones doc atualizado. (concluido)
 
 ---
 
